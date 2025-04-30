@@ -28,9 +28,14 @@
     "build": "tsup src/index.ts --dts --clean --format cjs,esm --out-dir dist",
     "test": "jest"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/This-Is-Prince/astrokit.git"
+  },
+  "homepage": "https://github.com/This-Is-Prince/astrokit/tree/main/packages/plugins/solana-solayer",
   "keywords": [
     "solana",
-    "adrena",
+    "solayer",
     "astrokit",
     "plugin",
     "defi",

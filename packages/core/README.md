@@ -10,6 +10,7 @@ The AstroKit architecture is designed around these key components:
 2. **Chain Adapters**: Components that adapt chain-specific wallet implementations to a common interface
 3. **Plugins**: Extensions that add specific functionality for different protocols and use cases
 4. **Actions**: High-level operations that can be executed by AI agents or applications
+5. **AI Agent Integration**: Built-in support for AI agents using LangChain and Vercel AI SDK
 
 ## Key Components
 
@@ -20,6 +21,7 @@ The `AstroKit` class is the main entry point for using the SDK. It:
 - Connects to a specific blockchain via a wallet
 - Loads and manages plugins
 - Provides methods to execute actions
+- Integrates with AI systems via the agent architecture
 
 ### Wallet Adapters
 
@@ -35,6 +37,7 @@ Plugins extend the SDK with additional functionality:
 - Each plugin can support one or multiple chains
 - Plugins provide methods and actions
 - Plugins can be combined to create rich experiences
+- Plugins follow a standard interface defined in `PluginBase`
 
 ### Actions
 
@@ -43,21 +46,48 @@ Actions are high-level operations that can be executed:
 - Each action has a unique ID, name, and description
 - Actions specify which chains they support
 - Actions provide an execution function that performs the operation
+- The action system integrates with AI agents to provide natural language understanding
+
+### AI Integration
+
+AstroKit Core includes:
+
+- LangChain integration for connecting to various large language models
+- Vercel AI SDK support for streaming responses and AI-based interactions
+- Tools for converting blockchain actions into AI-understandable formats
+
+## Project Structure
+
+```
+packages/core/
+├── src/
+│   ├── agent/            - Agent system and plugin architecture
+│   ├── constants/        - Common constants and configuration
+│   ├── langchain/        - LangChain integration components
+│   ├── types/            - TypeScript type definitions
+│   ├── utils/            - Utility functions and helpers
+│   ├── vercel-ai/        - Vercel AI SDK integration
+│   └── index.ts          - Main entry point and exports
+```
 
 ## Using AstroKit
 
 ### Installation
 
 ```bash
-npm install @astrokit/core
+npm install astrokit
+# or
+yarn add astrokit
+# or
+pnpm add astrokit
 ```
 
 ### Getting Started
 
 ```typescript
-import { AstroKit } from '@astrokit/core';
-import { EVMWalletAdapter } from '@astrokit/core/wallets';
-import { chains } from '@astrokit/core/chains';
+import { AstroKit } from 'astrokit';
+import { EVMWalletAdapter } from '@astrokit/wallet-evm';
+import { chains } from 'astrokit/chains';
 import { EVMPlugin } from '@astrokit/evm';
 
 // Create a wallet adapter
@@ -93,12 +123,38 @@ const solanaWallet = new SolanaWalletAdapter(yourSolanaWallet, chains.solana);
 const solanaAstro = new AstroKit(solanaWallet).use(new SolanaDefiPlugin());
 ```
 
+### AI Agent Integration
+
+AstroKit provides integration with AI systems:
+
+```typescript
+import { AstroKit } from 'astrokit';
+import { SolanaWalletAdapter } from '@astrokit/wallet-solana';
+import { SolanaJupiterPlugin } from '@astrokit/plugin-solana-jupiter';
+import { createLangchainAgent } from 'astrokit/langchain';
+
+// Create AstroKit instance with plugins
+const wallet = new SolanaWalletAdapter(yourSolanaWallet);
+const astro = new AstroKit(wallet).use(new SolanaJupiterPlugin());
+
+// Create an AI agent with the AstroKit instance
+const agent = createLangchainAgent(astro, {
+  model: 'gpt-4',
+  temperature: 0.7,
+});
+
+// Let the AI agent perform operations based on natural language
+const response = await agent.execute(
+  "Find me the best swap rate for 1 SOL to USDC and execute the trade"
+);
+```
+
 ## Creating Plugins
 
 You can create custom plugins by extending the `PluginBase` class:
 
 ```typescript
-import { PluginBase } from '@astrokit/core';
+import { PluginBase } from 'astrokit';
 
 export class MyPlugin extends PluginBase {
   constructor() {
@@ -137,6 +193,14 @@ export class MyPlugin extends PluginBase {
 3. **Composability**: Combine plugins to create rich experiences
 4. **Type Safety**: Full TypeScript support with intelligent typing
 5. **AI Ready**: Designed to work with AI agents through a clear action system
+6. **Modern Architecture**: ESM support and tree-shakable imports
+
+## Dependencies
+
+- [@langchain/core](https://github.com/langchain/langchain): For AI agent integration
+- [@solana/web3.js](https://github.com/solana-labs/solana-web3.js): For Solana blockchain interactions
+- [ai](https://github.com/vercel/ai): Vercel AI SDK for AI streaming and UI integration
+- [zod](https://github.com/colinhacks/zod): Schema validation and type safety
 
 ## License
 
